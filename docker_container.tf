@@ -14,9 +14,9 @@ resource "docker_container" "nginx" {
 
 resource "docker_container" "client" {
 
-  count = var.number_of_clients
+  for_each = toset(["client-alpha", "client-beta", "client-gamma"])
 
-  name  = "${var.containers["client"].container_name}-${count.index + 1}"
+  name  = "server-${each.value}"
   image = docker_image.client.name
   ports {
     internal = var.containers["client"].ports["internal"]
