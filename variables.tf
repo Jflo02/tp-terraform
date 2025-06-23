@@ -26,3 +26,57 @@ variable "number_of_clients" {
   type    = number
   default = 3
 }
+
+
+variable "machines" {
+  type = list(object({
+    name      = string
+    vcpu      = number
+    disk_size = number
+    region    = string
+  }))
+
+  validation {
+    condition = alltrue([
+      for m in var.machines : m.vcpu >= 2 && m.vcpu <= 64
+    ])
+    error_message = "Chaque machine doit avoir entre 2 et 64 vCPU."
+  }
+
+  validation {
+    condition = alltrue([
+      for m in var.machines : m.disk_size >= 20
+    ])
+    error_message = "Chaque machine doit avoir une taille de disque d'au moins 20 Go."
+  }
+
+
+  validation {
+
+    condition = alltrue([
+      for m in var.machines : contains(["eu-west-1", "us-east-1", "ap-southeast-1"], m.region)
+    ])
+    error_message = "Chaque machine doit être dans une des régions autorisées : eu-west-1, us-east-1, ap-southeast-1]."
+  }
+
+  default = [ {
+    name      = "machine-1"
+    vcpu      = 4
+    disk_size = 50
+    region    = "eu-west-1"
+  },
+  {
+    name      = "machine-2"
+    vcpu      = 8
+    disk_size = 100
+    region    = "us-east-1"
+  },
+  {
+    name      = "machine-3"
+    vcpu      = 16
+    disk_size = 200
+    region    = "ap-southeast-1"
+  } ]
+}
+
+
