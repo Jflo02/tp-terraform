@@ -57,7 +57,10 @@ resource "docker_image" "client" {
   keep_locally = true
 }
 resource "docker_container" "client" {
-  name  = var.containers["client"].container_name
+
+  count = var.number_of_clients
+
+  name  = "${var.containers["client"].container_name}-${count.index + 1}"
   image = docker_image.client.name
   ports {
     internal = var.containers["client"].ports["internal"]

@@ -17,7 +17,12 @@ variable "containers" {
     "client" = {
       container_name = "client"
       image_name     = "appropriate/curl"
-      ports          = { internal = 80, external = 8081 }
+      ports          = { internal = 80, external = null }
     }
   }
+}
+
+variable "number_of_clients" {
+  type    = number
+  default = 3
 }
