@@ -17,9 +17,40 @@ resource "local_file" "private_key" {
   file_permission = "0600"
 }
 
+
+data "aws_ami" "amazon_linux" {
+
+  most_recent = true
+
+  filter {
+
+    name = "virtualization-type"
+
+    values = ["hvm"]
+  }
+
+  filter {
+
+    name = "owner-alias"
+
+    values = ["amazon"]
+  }
+
+
+
+  filter {
+    name = "name"
+
+    values = ["amzn2-ami-ecs-hvm-*-x86_64-ebs"]
+  }
+
+  owners = ["amazon"]
+
+}
+
 # Create EC2 instance with Nginx
 resource "aws_instance" "web" {
-  ami             = "ami-12345678"
+  ami             = data.aws_ami.amazon_linux.id
   instance_type   = var.ec2.instance_type
   security_groups = [aws_security_group.web.name]
   key_name        = aws_key_pair.deployer.key_name
@@ -38,24 +69,5 @@ resource "aws_instance" "web" {
 
   tags = {
     Name = var.ec2.name
-  }
-}
-
-
-resource "aws_instance" "bdd" {
-  ami             = "ami-12345678"
-  instance_type   = var.ec2-bdd.instance_type
-  security_groups = [aws_security_group.web.name]
-  key_name        = aws_key_pair.deployer.key_name
-
-    user_data = <<-EOF
-                #!/bin/bash
-                # Echo to simulate BDD environment setup
-                echo "Setting up BDD environment..."
-                echo "BDD environment is ready!" > /home/ec2-user/bdd-setup.txt
-                EOF
-
-  tags = {
-    Name = var.ec2-bdd.name
   }
 }
